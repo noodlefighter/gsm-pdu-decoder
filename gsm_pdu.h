@@ -1,4 +1,4 @@
-
+#pragma once
 
 //###########################################################################
 // @INCLUDE
@@ -11,5 +11,3 @@
 #define SMS_PDU_MAX_LEN					140
 #define SMS_UDL_MAX_LEN					153
 #define LONG_SMS_TEXT_MAX_LEN			700
-
-#endif	//GSMLIB_PDU_H

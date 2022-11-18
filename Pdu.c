@@ -67,7 +67,7 @@ static UINT8 i_Hex2Ascii(UINT8 hexNibble)
 	{
 		return (hexNibble + 0x37);
 	}
-	
+
 	return (FALSE);
 }
 
@@ -78,7 +78,7 @@ static UINT8 i_Hex2Ascii(UINT8 hexNibble)
 // @DESCRIPTION : This function converts ascii pack to hex nibble.
 //***************************************************************************
 static UINT8 i_Ascii2Hex(UINT8 asciiChar)
-{		
+{
 	if ((asciiChar >= '0') && (asciiChar <= '9'))
 	{
 		return (asciiChar - 0x30);
@@ -87,7 +87,7 @@ static UINT8 i_Ascii2Hex(UINT8 asciiChar)
 	{
 		return (asciiChar - 0x37);
 	}
-	
+
 	return (FALSE);
 }
 
@@ -100,19 +100,19 @@ static UINT8 i_Ascii2Hex(UINT8 asciiChar)
 //***************************************************************************
 static UINT16 i_HexBuf2AsciiBuf(UINT8 *pHexBuf, UINT8 hexBufLen, char *pAsciiStrng)
 {
-	UINT8 idx = 0;
+	int idx = 0;
 	UINT8 hexData = 0;
 	UINT8 higherNibble = 0;
 	UINT8 lowerNibble = 0;
 	UINT8 asciiChar = 0;
 	UINT16 asciiIndex = 0;
-	
+
 	for (idx =0; idx < hexBufLen; idx++)
 	{
 		hexData = pHexBuf[idx];
 		higherNibble = hexData >> 4;
 		lowerNibble = hexData & 0x0F;
-		
+
 		asciiChar = i_Hex2Ascii(higherNibble);
 		if (asciiChar != FALSE)
 		{
@@ -122,7 +122,7 @@ static UINT16 i_HexBuf2AsciiBuf(UINT8 *pHexBuf, UINT8 hexBufLen, char *pAsciiStr
 		{
 			return (FALSE);
 		}
-		
+
 		asciiChar = i_Hex2Ascii(lowerNibble);
 		if (asciiChar != FALSE)
 		{
@@ -134,7 +134,7 @@ static UINT16 i_HexBuf2AsciiBuf(UINT8 *pHexBuf, UINT8 hexBufLen, char *pAsciiStr
 		}
 	}
 	pAsciiStrng[asciiIndex] = '\0';
-	
+
 	return (asciiIndex);
 }
 
@@ -147,33 +147,33 @@ static UINT16 i_HexBuf2AsciiBuf(UINT8 *pHexBuf, UINT8 hexBufLen, char *pAsciiStr
 //***************************************************************************
 static UINT8 i_AsciiBuf2HexBuf(char *pAsciiStrng, UINT8 *pHexBuf)
 {
-	UINT8 idx = 0;
+	int idx = 0;
 	UINT8 hexData = 0;
 	UINT8 higherNibble = 0;
 	UINT8 lowerNibble = 0;
 	UINT8 asciiChar = 0;
 	UINT8 hexIndex = 0;
 	UINT16 asciiLen= 0;
-	
+
 	asciiLen = strlen (pAsciiStrng);
 	asciiLen = asciiLen >> 1;
-	
+
 	for (idx =0; idx < asciiLen; idx++)
 	{
 		/* Process higher nibble */
 		asciiChar = pAsciiStrng[idx*2];
 		higherNibble = i_Ascii2Hex(asciiChar);
 		higherNibble = higherNibble << 4;
-		
+
 		/* Process lower nibble */
 		asciiChar = pAsciiStrng[(idx*2)+1];
 		lowerNibble = i_Ascii2Hex(asciiChar);
-		
+
 		/* Prepare complete hex byte */
 		hexData = higherNibble | lowerNibble;
 		pHexBuf[hexIndex++] = hexData;
 	}
-	
+
 	return (hexIndex);
 }
 
@@ -181,12 +181,12 @@ static UINT8 i_AsciiBuf2HexBuf(char *pAsciiStrng, UINT8 *pHexBuf)
 // @NAME        : Utf8StrToGsmStr
 // @PARAM       : UINT8 *cIn - the pointer to buffer containing UTF8 characters.
 //				  UINT16 cInLen - length of data in cIn buffer.
-//				  UINT8 *gsmOut - The pointer to buffer which carries converetd 
+//				  UINT8 *gsmOut - The pointer to buffer which carries converetd
 //								  string in Gsm character set.
-//				  UINT8 *gsmLen - The pointer to length of converetd data with 
+//				  UINT8 *gsmLen - The pointer to length of converetd data with
 //								  Gsm character set.
 // @RETURNS     : void
-// @DESCRIPTION : This function converts string in UTF8 character set to 
+// @DESCRIPTION : This function converts string in UTF8 character set to
 //				  Gsm cgaracter set.
 //***************************************************************************
 static void Utf8StrToGsmStr(UINT8 *cIn, UINT16 cInLen, UINT8 *gsmOut, UINT16 *gsmLen)
@@ -194,8 +194,8 @@ static void Utf8StrToGsmStr(UINT8 *cIn, UINT16 cInLen, UINT8 *gsmOut, UINT16 *gs
 	UINT16 gsmIdx = 0;
 	UINT16 cInidx = 0;
 	UINT8 charVar = 0;
-	
-	
+
+
 	while (cInidx < cInLen)
 	{
 		if (gsmIdx >= LONG_SMS_TEXT_MAX_LEN)
@@ -203,274 +203,274 @@ static void Utf8StrToGsmStr(UINT8 *cIn, UINT16 cInLen, UINT8 *gsmOut, UINT16 *gs
 			gsmIdx = LONG_SMS_TEXT_MAX_LEN;
 			break;
 		}
-		
+
 		charVar = cIn[cInidx++];
 		switch(charVar)
 		{
 			// Characters not listed here are equal to those in the
 			// UTF8 charset OR not present in it.
 
-			case 0x40: 
-				gsmOut[gsmIdx++] = 0; 
+			case 0x40:
+				gsmOut[gsmIdx++] = 0;
 				break;
-				
-			case 0x24: 
-				gsmOut[gsmIdx++] = 2; 
-				break;			
-				
-			case 0x5F: 
-				gsmOut[gsmIdx++] = 17; 
-				break;						
-				
+
+			case 0x24:
+				gsmOut[gsmIdx++] = 2;
+				break;
+
+			case 0x5F:
+				gsmOut[gsmIdx++] = 17;
+				break;
+
 			case 0xc2:
 				switch (cIn[cInidx++])
 				{
 					case 0xA3:
-						gsmOut[gsmIdx++] = 1; 
+						gsmOut[gsmIdx++] = 1;
 						break;
-						
+
 					case 0xA5:
-						gsmOut[gsmIdx++] = 3; 
-						break;					
-						
+						gsmOut[gsmIdx++] = 3;
+						break;
+
 					case 0xA4:
-						gsmOut[gsmIdx++] = 36; 
-						break;										
-						
+						gsmOut[gsmIdx++] = 36;
+						break;
+
 					case 0xA1:
-						gsmOut[gsmIdx++] = 64; 
-						break;															
-						
+						gsmOut[gsmIdx++] = 64;
+						break;
+
 					case 0xA7:
-						gsmOut[gsmIdx++] = 95; 
-						break;	
-						
+						gsmOut[gsmIdx++] = 95;
+						break;
+
 					case 0xBF:
-						gsmOut[gsmIdx++] = 96; 
-						break;				
-						
+						gsmOut[gsmIdx++] = 96;
+						break;
+
 					default:
-						gsmOut[gsmIdx++] = ' '; 
-						break;					
+						gsmOut[gsmIdx++] = ' ';
+						break;
 				}
 				break;
-				
+
 			case 0xc3:
 				switch (cIn[cInidx++])
 				{
 					case 0xA8:
-						gsmOut[gsmIdx++] = 4; 
+						gsmOut[gsmIdx++] = 4;
 						break;
-						
+
 					case 0xA9:
-						gsmOut[gsmIdx++] = 5; 
-						break;					
-						
+						gsmOut[gsmIdx++] = 5;
+						break;
+
 					case 0xB9:
-						gsmOut[gsmIdx++] = 6; 
-						break;										
-						
+						gsmOut[gsmIdx++] = 6;
+						break;
+
 					case 0xAC:
-						gsmOut[gsmIdx++] = 7; 
-						break;															
-						
+						gsmOut[gsmIdx++] = 7;
+						break;
+
 					case 0xB2:
-						gsmOut[gsmIdx++] = 8; 
-						break;								
-						
+						gsmOut[gsmIdx++] = 8;
+						break;
+
 					case 0x87:
-						gsmOut[gsmIdx++] = 9; 
-						break;																				
-						
+						gsmOut[gsmIdx++] = 9;
+						break;
+
 					case 0x98:
-						gsmOut[gsmIdx++] = 11; 
-						break;	
-						
+						gsmOut[gsmIdx++] = 11;
+						break;
+
 					case 0xB8:
-						gsmOut[gsmIdx++] = 12; 
+						gsmOut[gsmIdx++] = 12;
 						break;
-						
+
 					case 0x85:
-						gsmOut[gsmIdx++] = 14; 
-						break;	
-						
+						gsmOut[gsmIdx++] = 14;
+						break;
+
 					case 0xA5:
-						gsmOut[gsmIdx++] = 15; 
-						break;	
-						
+						gsmOut[gsmIdx++] = 15;
+						break;
+
 					case 0x86:
-						gsmOut[gsmIdx++] = 28; 
-						break;	
-						
+						gsmOut[gsmIdx++] = 28;
+						break;
+
 					case 0xA6:
-						gsmOut[gsmIdx++] = 29; 
-						break;					
-						
+						gsmOut[gsmIdx++] = 29;
+						break;
+
 					case 0x9F:
-						gsmOut[gsmIdx++] = 30; 
-						break;					
-						
+						gsmOut[gsmIdx++] = 30;
+						break;
+
 					case 0x89:
-						gsmOut[gsmIdx++] = 31; 
-						break;					
-						
+						gsmOut[gsmIdx++] = 31;
+						break;
+
 					case 0x84:
-						gsmOut[gsmIdx++] = 91; 
+						gsmOut[gsmIdx++] = 91;
 						break;
-						
+
 					case 0x96:
-						gsmOut[gsmIdx++] = 92; 
-						break;										
-						
+						gsmOut[gsmIdx++] = 92;
+						break;
+
 					case 0x91:
-						gsmOut[gsmIdx++] = 93; 
-						break;										
-						
+						gsmOut[gsmIdx++] = 93;
+						break;
+
 					case 0x9C:
-						gsmOut[gsmIdx++] = 94; 
+						gsmOut[gsmIdx++] = 94;
 						break;
-						
+
 					case 0xA4:
-						gsmOut[gsmIdx++] = 123; 
+						gsmOut[gsmIdx++] = 123;
 						break;
-						
+
 					case 0xB6:
-						gsmOut[gsmIdx++] = 124; 
+						gsmOut[gsmIdx++] = 124;
 						break;
-						
+
 					case 0xB1:
-						gsmOut[gsmIdx++] = 125; 
+						gsmOut[gsmIdx++] = 125;
 						break;
-						
+
 					case 0xBC:
-						gsmOut[gsmIdx++] = 126; 
+						gsmOut[gsmIdx++] = 126;
 						break;
-						
+
 					case 0xA0:
-						gsmOut[gsmIdx++] = 127; 
+						gsmOut[gsmIdx++] = 127;
 						break;
-						
+
 					default:
-						gsmOut[gsmIdx++] = ' '; 
+						gsmOut[gsmIdx++] = ' ';
 						break;
 				}
-				break;	
-				
-				
+				break;
+
+
 			case 0xce:
 				switch (cIn[cInidx++])
 				{
 					case 0x94:
 						gsmOut[gsmIdx++] = 16;
 						break;
-						
+
 					case 0xA6:
 						gsmOut[gsmIdx++] = 18;
 						break;
-						
+
 					case 0x9B:
 						gsmOut[gsmIdx++] = 20;
 						break;
-						
+
 					case 0xA9:
 						gsmOut[gsmIdx++] = 21;
 						break;
-						
+
 					case 0xA0:
 						gsmOut[gsmIdx++] = 22;
-						break;												
-						
+						break;
+
 					case 0xA8:
 						gsmOut[gsmIdx++] = 23;
 						break;
-						
+
 					case 0xA3:
 						gsmOut[gsmIdx++] = 24;
 						break;
-						
+
 					case 0x98:
 						gsmOut[gsmIdx++] = 25;
 						break;
-						
+
 					case 0x9E:
 						gsmOut[gsmIdx++] = 26;
-						break;	
-						
+						break;
+
 					default:
 						gsmOut[gsmIdx++] = ' ';
 						break;
 				}
 				break;
-				
+
 			case 0xe2:
 				if ((cIn[cInidx++] == 0x82) /*&& (cIn[cInidx++] == 0x03)*/)
 				{
 						switch (cIn[cInidx++])
-						{	
+						{
 							case 0xAC:
-								gsmOut[gsmIdx++] = ESC_CHR; 
-								gsmOut[gsmIdx++] = 0x65; 
+								gsmOut[gsmIdx++] = ESC_CHR;
+								gsmOut[gsmIdx++] = 0x65;
 								break;
-								
+
 							default:
-								gsmOut[gsmIdx++] = ' '; 
-								break;							
+								gsmOut[gsmIdx++] = ' ';
+								break;
 						}
 				}
 				break;
 
 			// extension table
-			case '\f': 
+			case '\f':
 				gsmOut[gsmIdx++] = ESC_CHR;
-				gsmOut[gsmIdx++] = 10; 
+				gsmOut[gsmIdx++] = 10;
 				break; // form feed, 0x0C
-				
-			case '^': 
+
+			case '^':
 				gsmOut[gsmIdx++] = ESC_CHR;
-				gsmOut[gsmIdx++] = 20; 
-				break;
-				
-			case '{': 
-				gsmOut[gsmIdx++] = ESC_CHR;		
-				gsmOut[gsmIdx++] = 40;
-				break;
-				
-			case '}': 
-				gsmOut[gsmIdx++] = ESC_CHR;		
-				gsmOut[gsmIdx++] = 41;
-				break;
-				
-			case '\\':
-				gsmOut[gsmIdx++] = ESC_CHR;		
-				gsmOut[gsmIdx++] = 47; 
-				break;
-				
-			case '[': 
-				gsmOut[gsmIdx++] = ESC_CHR;		
-				gsmOut[gsmIdx++] = 60; 
-				break;
-				
-			case '~': 
-				gsmOut[gsmIdx++] = ESC_CHR;		
-				gsmOut[gsmIdx++] = 61; 
-				break;
-				
-			case ']': 
-				gsmOut[gsmIdx++] = ESC_CHR;		
-				gsmOut[gsmIdx++] = 62; 
-				break;
-				
-			case '|': 
-				gsmOut[gsmIdx++] = ESC_CHR;	
-				gsmOut[gsmIdx++] = 64; 
+				gsmOut[gsmIdx++] = 20;
 				break;
 
-			default: 
+			case '{':
+				gsmOut[gsmIdx++] = ESC_CHR;
+				gsmOut[gsmIdx++] = 40;
+				break;
+
+			case '}':
+				gsmOut[gsmIdx++] = ESC_CHR;
+				gsmOut[gsmIdx++] = 41;
+				break;
+
+			case '\\':
+				gsmOut[gsmIdx++] = ESC_CHR;
+				gsmOut[gsmIdx++] = 47;
+				break;
+
+			case '[':
+				gsmOut[gsmIdx++] = ESC_CHR;
+				gsmOut[gsmIdx++] = 60;
+				break;
+
+			case '~':
+				gsmOut[gsmIdx++] = ESC_CHR;
+				gsmOut[gsmIdx++] = 61;
+				break;
+
+			case ']':
+				gsmOut[gsmIdx++] = ESC_CHR;
+				gsmOut[gsmIdx++] = 62;
+				break;
+
+			case '|':
+				gsmOut[gsmIdx++] = ESC_CHR;
+				gsmOut[gsmIdx++] = 64;
+				break;
+
+			default:
 				gsmOut[gsmIdx++] = charVar;
 				break;
 		}
 	}
-	
+
 	*gsmLen = gsmIdx;
 }
 
@@ -478,233 +478,233 @@ static void Utf8StrToGsmStr(UINT8 *cIn, UINT16 cInLen, UINT8 *gsmOut, UINT16 *gs
 // @NAME        : Gsm7BitDfltChrToUtf8Chr
 // @PARAM       : char cIn - Gsm7 bit default Character.
 //				  UINT8 *utf8Char - The pointer to converted UTF character.
-//				  UINT8 *utf8CharLen - The pointer to length of converted UTF 
+//				  UINT8 *utf8CharLen - The pointer to length of converted UTF
 //				 					   character.
 // @RETURNS     : void
-// @DESCRIPTION : This function converts Gsm 7-bit default character to UTF 
+// @DESCRIPTION : This function converts Gsm 7-bit default character to UTF
 //				  characetr set.
 //***************************************************************************
 static void Gsm7BitDfltChrToUtf8Chr(char cIn, UINT8 *utf8Char, UINT8 *utf8CharLen)
 {
 	UINT8 idx = 0;
-	
+
 	switch(cIn)
 	{
 		// Characters not listed here are equal to those in the
 		// UTF8 charset OR not present in it.
 
-		case 0: 
-			utf8Char[idx++] = 0x40; 
+		case 0:
+			utf8Char[idx++] = 0x40;
 			break;
-			
-		case 1: 
+
+		case 1:
 			utf8Char[idx++] = 0xc2;
 			utf8Char[idx++] = 0xA3;
 			break;
-			
+
 		case 2:
-			utf8Char[idx++] = 0x24; 
+			utf8Char[idx++] = 0x24;
 			break;
-			
-		case 3: 
-			utf8Char[idx++] = 0xc2;	
-			utf8Char[idx++] = 0xA5; 
+
+		case 3:
+			utf8Char[idx++] = 0xc2;
+			utf8Char[idx++] = 0xA5;
 			break;
-			
-		case 4: 
+
+		case 4:
 			utf8Char[idx++] = 0xc3;
 			utf8Char[idx++] = 0xA8;
 			break;
-			
-		case 5: 
+
+		case 5:
 			utf8Char[idx++] = 0xc3;
-			utf8Char[idx++] = 0xA9; 
+			utf8Char[idx++] = 0xA9;
 			break;
-			
-		case 6: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0xB9; 
+
+		case 6:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0xB9;
 			break;
-			
-		case 7: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0xAC; 
+
+		case 7:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0xAC;
 			break;
-			
-		case 8: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0xB2; 
+
+		case 8:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0xB2;
 			break;
-			
-		case 9: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0x87; 
+
+		case 9:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0x87;
 			break;
-			
-		case 11: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0x98; 
+
+		case 11:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0x98;
 			break;
-			
-		case 12: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0xB8; 
+
+		case 12:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0xB8;
 			break;
-			
-		case 14: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0x85; 
+
+		case 14:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0x85;
 			break;
-			
-		case 15: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0xA5; 
-			break;		
-		
-		case 16: 
-			utf8Char[idx++] = 0xce; 
-			utf8Char[idx++] = 0x94; 
-			break;	/* Added */	
-		
-		case 17: 
-			utf8Char[idx++] = 0x5F; 
+
+		case 15:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0xA5;
 			break;
-		
-		case 18: 
+
+		case 16:
 			utf8Char[idx++] = 0xce;
-			utf8Char[idx++] = 0xA6; 
-			break;	/* Added */	
-			
-		case 19: 
+			utf8Char[idx++] = 0x94;
+			break;	/* Added */
+
+		case 17:
+			utf8Char[idx++] = 0x5F;
+			break;
+
+		case 18:
+			utf8Char[idx++] = 0xce;
+			utf8Char[idx++] = 0xA6;
+			break;	/* Added */
+
+		case 19:
 			/* Pending */
-			break;	/* Added */	
-			
-		case 20: 
-			utf8Char[idx++] = 0xce; 	
+			break;	/* Added */
+
+		case 20:
+			utf8Char[idx++] = 0xce;
 			utf8Char[idx++] = 0x9B;
-			break;	/* Added */	
-			
-		case 21: 
+			break;	/* Added */
+
+		case 21:
 			utf8Char[idx++] = 0xce;
-			utf8Char[idx++] = 0xA9; 
-			break;	/* Added */	
-			
-		case 22: 
+			utf8Char[idx++] = 0xA9;
+			break;	/* Added */
+
+		case 22:
 			utf8Char[idx++] = 0xce;
-			utf8Char[idx++] = 0xA0; 
-			break;	/* Added */	
-			
-		case 23: 
-			utf8Char[idx++] = 0xce; 
-			utf8Char[idx++] = 0xA8; 
-			break;	/* Added */	
-			
-		case 24: 
-			utf8Char[idx++] = 0xce; 
-			utf8Char[idx++] = 0xA3; 
-			break;	/* Added */	
-			
-		case 25: 
+			utf8Char[idx++] = 0xA0;
+			break;	/* Added */
+
+		case 23:
 			utf8Char[idx++] = 0xce;
-			utf8Char[idx++] = 0x98; 
-			break;	/* Added */	
-		case 26: 
-			utf8Char[idx++] = 0xce; 
-			utf8Char[idx++] = 0x9E; 
-			break;	/* Added */	
-		
-		case 28: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0x86; 			
+			utf8Char[idx++] = 0xA8;
+			break;	/* Added */
+
+		case 24:
+			utf8Char[idx++] = 0xce;
+			utf8Char[idx++] = 0xA3;
+			break;	/* Added */
+
+		case 25:
+			utf8Char[idx++] = 0xce;
+			utf8Char[idx++] = 0x98;
+			break;	/* Added */
+		case 26:
+			utf8Char[idx++] = 0xce;
+			utf8Char[idx++] = 0x9E;
+			break;	/* Added */
+
+		case 28:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0x86;
 			break;
-			
-		case 29: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0xA6; 			
+
+		case 29:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0xA6;
 			break;
-			
-		case 30: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0x9F; 			
+
+		case 30:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0x9F;
 			break;
-			
-		case 31: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0x89; 			
+
+		case 31:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0x89;
 			break;
-			
-		case 36: 
-			utf8Char[idx++] = 0xc2; 
-			utf8Char[idx++] = 0xA4; 
+
+		case 36:
+			utf8Char[idx++] = 0xc2;
+			utf8Char[idx++] = 0xA4;
 			break; // 164 in UTF8
-			
-		case 64: 
-			utf8Char[idx++] = 0xc2; 
-			utf8Char[idx++] = 0xA1; 
+
+		case 64:
+			utf8Char[idx++] = 0xc2;
+			utf8Char[idx++] = 0xA1;
 			break;
-			
+
 		// 65-90 capital letters
-		case 91: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0x84; 
+		case 91:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0x84;
 			break;
-			
-		case 92: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0x96; 			
+
+		case 92:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0x96;
 			break;
-			
-		case 93: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0x91; 						
+
+		case 93:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0x91;
 			break;
-			
-		case 94: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0x9C; 						
+
+		case 94:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0x9C;
 			break;
-			
-		case 95: 
-			utf8Char[idx++] = 0xc2; 
-			utf8Char[idx++] = 0xA7; 						
+
+		case 95:
+			utf8Char[idx++] = 0xc2;
+			utf8Char[idx++] = 0xA7;
 			break;
-			
+
 		case 96:
-			utf8Char[idx++] = 0xc2; 
-			utf8Char[idx++] = 0xBF; 									
+			utf8Char[idx++] = 0xc2;
+			utf8Char[idx++] = 0xBF;
 			break;
-			
+
 		// 97-122 small letters
-		case 123: 
-			utf8Char[idx++] = 0xc3; 
+		case 123:
+			utf8Char[idx++] = 0xc3;
 			utf8Char[idx++] = 0xA4;
 			break;
-			
-		case 124: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0xB6;			
+
+		case 124:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0xB6;
 			break;
-			
-		case 125: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0xB1;				
+
+		case 125:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0xB1;
 			break;
-			
-		case 126: 
-			utf8Char[idx++] = 0xc3; 
-			utf8Char[idx++] = 0xBC;							
+
+		case 126:
+			utf8Char[idx++] = 0xc3;
+			utf8Char[idx++] = 0xBC;
 			break;
-			
-		case 127: 
-			utf8Char[idx++] = 0xc3; 
+
+		case 127:
+			utf8Char[idx++] = 0xc3;
 			utf8Char[idx++] = 0xA0;
 			break;
 
-		default: 
-			utf8Char[idx++] = cIn; 
+		default:
+			utf8Char[idx++] = cIn;
 			break;
 	}
-	
+
 	*utf8CharLen = idx;
 }
 
@@ -712,69 +712,69 @@ static void Gsm7BitDfltChrToUtf8Chr(char cIn, UINT8 *utf8Char, UINT8 *utf8CharLe
 // @NAME        : GsmExt7BitChrToUtf8Chr
 // @PARAM       : char cIn - Gsm extended 7-bit default Character.
 //				  UINT8 *utf8Char - The pointer to converted UTF character.
-//				  UINT8 *utf8CharLen - The pointer to length of converted UTF 
+//				  UINT8 *utf8CharLen - The pointer to length of converted UTF
 //				 					   character.
 // @RETURNS     : void
-// @DESCRIPTION : This function converts Gsm extended 7-bit character to UTF 
+// @DESCRIPTION : This function converts Gsm extended 7-bit character to UTF
 //				  characetr set.
 //***************************************************************************
 static void GsmExt7BitChrToUtf8Chr(char cIn, UINT8 *utf8Char, UINT8 *utf8CharLen)
 {
 	UINT8 idx = 0;
-	
+
 	switch(cIn)
 	{
 		// Characters not listed here are equal to those in the
 		// UTF8 charset OR not present in it.
 
 		// extension table
-		case 10: 
-			utf8Char[idx++] = '\f'; 
+		case 10:
+			utf8Char[idx++] = '\f';
 			break; // form feed, 0x0C
-			
-		case 20: 
-			utf8Char[idx++] = '^';  
+
+		case 20:
+			utf8Char[idx++] = '^';
 			break;
-			
-		case 40: 
-			utf8Char[idx++] = '{';  
+
+		case 40:
+			utf8Char[idx++] = '{';
 			break;
-			
-		case 41: 
-			utf8Char[idx++] = '}';  
+
+		case 41:
+			utf8Char[idx++] = '}';
 			break;
-			
+
 		case 47:
-			utf8Char[idx++] = '\\';  
+			utf8Char[idx++] = '\\';
 			break;
-			
-		case 60: 
-			utf8Char[idx++] = '[';  
+
+		case 60:
+			utf8Char[idx++] = '[';
 			break;
-			
-		case 61: 
-			utf8Char[idx++] = '~';  
+
+		case 61:
+			utf8Char[idx++] = '~';
 			break;
-			
-		case 62: 
-			utf8Char[idx++] = ']';  
+
+		case 62:
+			utf8Char[idx++] = ']';
 			break;
-			
-		case 64: 
-			utf8Char[idx++] = '|';  
+
+		case 64:
+			utf8Char[idx++] = '|';
 			break;
-			
-		case 101: 
-			utf8Char[idx++] = 0xe2;  
-			utf8Char[idx++] = 0x82;  
-			utf8Char[idx++] = 0xAC;  
+
+		case 101:
+			utf8Char[idx++] = 0xe2;
+			utf8Char[idx++] = 0x82;
+			utf8Char[idx++] = 0xAC;
 			break; // 164 in UTF8
 
-		default: 
-			utf8Char[idx++] = cIn; 
+		default:
+			utf8Char[idx++] = cIn;
 			break;
 	}
-	
+
 	*utf8CharLen = idx;
 }
 
@@ -782,17 +782,17 @@ static void GsmExt7BitChrToUtf8Chr(char cIn, UINT8 *utf8Char, UINT8 *utf8CharLen
 // @NAME        : GsmStrToUtf8Str
 // @PARAM       : UINT8 *pStrInGsm - The pointer to string with Gsm character set.
 //				  UINT8 strInGsmLen - length of string with gsm character set..
-//				  UINT8 *pStrOutUtf - The pointer to buffer containing converted 
+//				  UINT8 *pStrOutUtf - The pointer to buffer containing converted
 //									  UTF8 character set.
 // @RETURNS     : void
 // @DESCRIPTION : This function converts Gsm 7-bit characters to UTF8 characters.
 //***************************************************************************
 static UINT16 GsmStrToUtf8Str(UINT8 *pStrInGsm, UINT8 strInGsmLen, UINT8 *pStrOutUtf)
 {
-	UINT8 index = 0;
+	int index = 0;
 	UINT8 utf8CharLen = 0;
-	UINT16 cnvrtdStrIndex = 0;	
-	
+	UINT16 cnvrtdStrIndex = 0;
+
 	for (index = 0; index < strInGsmLen; index++)
 	{
 		if (pStrInGsm[index] == ESC_CHR)
@@ -807,13 +807,13 @@ static UINT16 GsmStrToUtf8Str(UINT8 *pStrInGsm, UINT8 strInGsmLen, UINT8 *pStrOu
 			cnvrtdStrIndex += utf8CharLen;
 		}
 	}
-	
+
 	if (cnvrtdStrIndex > 550)
 	{
 		cnvrtdStrIndex = 550;
 	}
-	pStrOutUtf[cnvrtdStrIndex] = '\0';	
-	
+	pStrOutUtf[cnvrtdStrIndex] = '\0';
+
 	return (cnvrtdStrIndex);
 }
 
@@ -826,20 +826,20 @@ static UINT16 GsmStrToUtf8Str(UINT8 *pStrInGsm, UINT8 strInGsmLen, UINT8 *pStrOu
 //***************************************************************************
 static UINT8 i_DecSemiOctet2Ascii(char *pDecSemiOctetBuf, char *pAsciiStrng)
 {
-	UINT8 idx = 0;
+	int idx = 0;
 	UINT8 asciiChar = 0;
 	UINT8 asciiNextChar = 0;
-	UINT8 decSemiOctetLen= 0;	
+	UINT8 decSemiOctetLen= 0;
 	UINT8 loopCnt = 0;
-	
+
 	decSemiOctetLen = strlen (pDecSemiOctetBuf);
 	loopCnt = decSemiOctetLen >> 1;
-	
+
 	for (idx = 0; idx < loopCnt; idx++)
 	{
 		asciiChar = pDecSemiOctetBuf[idx*2];
 		asciiNextChar = pDecSemiOctetBuf[(idx*2) + 1];
-		
+
 		pAsciiStrng[idx*2] = asciiNextChar;
 		if (idx == (loopCnt - 1))
 		{
@@ -858,9 +858,9 @@ static UINT8 i_DecSemiOctet2Ascii(char *pDecSemiOctetBuf, char *pAsciiStrng)
 			pAsciiStrng[(idx*2) + 1] = asciiChar;
 		}
 	}
-	
+
 	pAsciiStrng[idx*2] = '\0';
-	
+
 	return (decSemiOctetLen);
 }
 
@@ -874,13 +874,13 @@ static UINT8 i_DecSemiOctet2Ascii(char *pDecSemiOctetBuf, char *pAsciiStrng)
 //***************************************************************************
 static UINT8 i_Ascii2DecSemiOctet(char *pAsciiStrng, char *pDecSemiOctetBuf)
 {
-	UINT8 idx = 0;
+	int idx = 0;
 	UINT8 asciiChar = 0;
 	UINT8 asciiNextChar = 0;
-	UINT8 asciiLen= 0;	
+	UINT8 asciiLen= 0;
 	UINT8 loopCnt = 0;
 	UINT8 isToAddF = 0;
-	
+
 	asciiLen = strlen (pAsciiStrng);
 	if ((asciiLen % 2) != 0)
 	{
@@ -888,7 +888,7 @@ static UINT8 i_Ascii2DecSemiOctet(char *pAsciiStrng, char *pDecSemiOctetBuf)
 		isToAddF = TRUE;
 	}
 	loopCnt = asciiLen >> 1;
-	
+
 	for (idx = 0; idx < loopCnt; idx++)
 	{
 		asciiChar = pAsciiStrng[idx*2];
@@ -907,12 +907,12 @@ static UINT8 i_Ascii2DecSemiOctet(char *pAsciiStrng, char *pDecSemiOctetBuf)
 		{
 			asciiNextChar = pAsciiStrng[(idx*2) + 1];
 		}
-		
+
 		pDecSemiOctetBuf[idx*2] = asciiNextChar;
 		pDecSemiOctetBuf[(idx*2) + 1] = asciiChar;
 	}
 	pDecSemiOctetBuf[idx*2] = '\0';
-	
+
 	return (asciiLen);
 }
 
@@ -926,7 +926,7 @@ static UINT8 i_Ascii2DecSemiOctet(char *pAsciiStrng, char *pDecSemiOctetBuf)
 //***************************************************************************
 static UINT8 i_Text2Pdu(char *pAsciiBuf, UINT8 asciiLen, UINT8 *pPduBuf)
 {
-	UINT8 idx = 0;
+	int idx = 0;
 	UINT8 index = 0;
 	UINT8 pduIndex = 0;
 	UINT8 procChar = 0;
@@ -934,12 +934,12 @@ static UINT8 i_Text2Pdu(char *pAsciiBuf, UINT8 asciiLen, UINT8 *pPduBuf)
 	UINT8 procVariable = 0;
 	UINT8 tempVariable;
 	UINT8 asciiChar = 0;
-	
+
 	for (idx = 0; idx < asciiLen; idx++)
 	{
 		asciiChar = pAsciiBuf[idx];
 		procChar = asciiChar >> index;
-		
+
 		if (index != 7)
 		{
 			procNextChar = pAsciiBuf[idx + 1];
@@ -953,7 +953,7 @@ static UINT8 i_Text2Pdu(char *pAsciiBuf, UINT8 asciiLen, UINT8 *pPduBuf)
 		index++;
 		if (index > 7)	index = 0;
 	}
-	
+
 	return (pduIndex);
 }
 
@@ -967,7 +967,7 @@ static UINT8 i_Text2Pdu(char *pAsciiBuf, UINT8 asciiLen, UINT8 *pPduBuf)
 //***************************************************************************
 static UINT8 i_Pdu2Text(UINT8 *pPduBuf, UINT8 pduLen, char *pAsciiBuf)
 {
-	UINT8 idx = 0;
+	int idx = 0;
 	UINT8 index = 0;
 	UINT8 asciiIndex = 0;
 	UINT8 procByte = 0;
@@ -975,8 +975,8 @@ static UINT8 i_Pdu2Text(UINT8 *pPduBuf, UINT8 pduLen, char *pAsciiBuf)
 	UINT8 procVariable = 0;
 	UINT8 tempVariable = 0;
 	UINT8 pduByte = 0;
-	
-	
+
+
 	for (idx = 0; idx < pduLen; idx++)
 	{
 		pduByte = pPduBuf[idx];
@@ -994,7 +994,7 @@ static UINT8 i_Pdu2Text(UINT8 *pPduBuf, UINT8 pduLen, char *pAsciiBuf)
 		{
 			tempVariable = 0;
 		}
-		
+
 		pAsciiBuf[asciiIndex++] = procByte | tempVariable;
 		if (index == 6)
 		{
@@ -1010,13 +1010,13 @@ static UINT8 i_Pdu2Text(UINT8 *pPduBuf, UINT8 pduLen, char *pAsciiBuf)
 				pAsciiBuf[asciiIndex++] = pduByte >> 1;
 			}
 		}
-		
+
 		index++;
 		if (index  > 6)		index = 0;
 	}
-	
+
 	pAsciiBuf[asciiIndex] = '\0';
-	
+
 	return (asciiIndex);
 }
 
@@ -1031,26 +1031,26 @@ static UINT8 i_Pdu2Text(UINT8 *pPduBuf, UINT8 pduLen, char *pAsciiBuf)
 //***************************************************************************
 BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 {
-	 UINT8 idx = 0;
-	 UINT8 length = 0;
+	 int idx = 0;
+	 int length = 0;
 	 UINT8 addrLen = 0;
 	 UINT8 asciiLen = 0;
 	 UINT8 npi = 0;
 	 UINT8 udl = 0;
-	 UINT8 hexBuf[SMS_PDU_MAX_LEN];
+	 UINT8 hexBuf[SMS_PDU_MAX_LEN] = {0};
 	 UINT8 oct = 0;
 	 UINT8 grpId = 0;
-	 
+
 	 /** Converting whole Ascii String to Hex String */
 	 i_AsciiBuf2HexBuf(pGsmPduStr, hexBuf);
-	 
+
 	 /** Service center Number Length */
 	 pPduDecodeDesc->smscAddrLen = hexBuf[idx++];
-	
+
 	 /** Service Center Type of Address (Eg: 91 , 81) */
 	 pPduDecodeDesc->smscTypeOfAddr = hexBuf[idx++];
 	 /** Numbering Plan Identification */
-	 npi = pPduDecodeDesc->smscTypeOfAddr & 0x0F; 
+	 npi = pPduDecodeDesc->smscTypeOfAddr & 0x0F;
 	 /** Type of Number */
 	 pPduDecodeDesc->smscTypeOfAddr = (pPduDecodeDesc->smscTypeOfAddr & 0x70) >> 4;
 
@@ -1059,7 +1059,7 @@ BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 	 i_HexBuf2AsciiBuf(&hexBuf[idx], addrLen, pPduDecodeDesc->smscAddr);
 	 pPduDecodeDesc->smscAddrLen = i_DecSemiOctet2Ascii(pPduDecodeDesc->smscAddr, pPduDecodeDesc->smscAddr); // Internal Swapping
 	 idx = idx + addrLen;
-		
+
 	 /** First Octet of SMS_DELIVER PDU */
 	 pPduDecodeDesc->firstOct = hexBuf[idx++];
 	 if ((pPduDecodeDesc->firstOct & 0x40) == USER_DATA_HEADER_INDICATION)
@@ -1073,29 +1073,29 @@ BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 		 case MSG_TYPE_SMS_DELIVER:
 			pPduDecodeDesc->msgType = MSG_TYPE_SMS_DELIVER;
 			break;
-			
+
 		 case MSG_TYPE_SMS_STATUS_REPORT:
 			pPduDecodeDesc->msgType = MSG_TYPE_SMS_STATUS_REPORT;
 			/** Message Reference Number TP-MR of SMS_STATUS_REPORT PDU */
 			pPduDecodeDesc->msgRefNo = hexBuf[idx++];
 			break;
-		
+
 		 default:
 			*pError = ERR_MSG_TYPE;
 			return (FALSE);
 			break;
 	 }
-	 
+
 	 /** Phone Number Length */
 	 pPduDecodeDesc->phoneAddrLen = hexBuf[idx++];
-		 
+
 	 /** Phone Number Type of Address (Eg: 91 , 81) */
 	 pPduDecodeDesc->phoneTypeOfAddr = hexBuf[idx++];
 	 /** Numbering Plan Identification */
 	 npi = pPduDecodeDesc->phoneTypeOfAddr & 0x0F;
 	 /** Type of Number */
 	 pPduDecodeDesc->phoneTypeOfAddr = (pPduDecodeDesc->phoneTypeOfAddr & 0x70) >> 4;
-	 
+
 	 /** Check type of number */
 	 switch (pPduDecodeDesc->phoneTypeOfAddr)
 	 {
@@ -1106,7 +1106,7 @@ BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 				if (npi != NUM_PLAN_ISDN)
 				{
 					*pError = ERR_PHONE_NUM_PLAN;
-					 return (FALSE);	 
+					 return (FALSE);
 				}
 				/** Phone Number (Source Address) */
 				if (((addrLen = pPduDecodeDesc->phoneAddrLen) % 2) != 0)
@@ -1120,19 +1120,19 @@ BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 				i_DecSemiOctet2Ascii(pPduDecodeDesc->phoneAddr, pPduDecodeDesc->phoneAddr); // Internal Swapping
 				idx = idx + addrLen;
 				break;
-				
+
 		 case NUM_TYPE_ALPHANUMERIC:
 				addrLen = pPduDecodeDesc->phoneAddrLen; // length is in terms of Ascii characters
 				addrLen = addrLen >> 1; // addrLen / 2
-				pPduDecodeDesc->phoneAddrLen = i_Pdu2Text(&hexBuf[idx], addrLen, pPduDecodeDesc->phoneAddr);	
+				pPduDecodeDesc->phoneAddrLen = i_Pdu2Text(&hexBuf[idx], addrLen, pPduDecodeDesc->phoneAddr);
 				break;
-		
+
 		 default:
-			*pError = ERR_PHONE_TYPE_OF_ADDR;	
+			*pError = ERR_PHONE_TYPE_OF_ADDR;
 			return (FALSE);
 			break;
 	 }
-	 	 
+
 	 if (pPduDecodeDesc->msgType == MSG_TYPE_SMS_DELIVER)
 	 {
 		/** Protocol Identifier */
@@ -1142,11 +1142,11 @@ BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 			 *pError = ERR_PROTOCOL_ID;
 			 return (FALSE);
 		}
-		
+
 		/** Data Coding Scheme */
 		pPduDecodeDesc->dataCodeScheme = hexBuf[idx++];
 		grpId = pPduDecodeDesc->dataCodeScheme & 0xF0;
-		
+
 		switch (grpId)
 		{
 			case GROUP1_WITH_MSG_CLASS:
@@ -1157,43 +1157,43 @@ BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 					case GSM_7BIT:
 						pPduDecodeDesc->usrDataFormat = GSM_7BIT;
 						break;
-				
+
 					case ANSI_8BIT:
 						pPduDecodeDesc->usrDataFormat = ANSI_8BIT;
 						break;
-			
+
 					case UCS2_16BIT:
 						pPduDecodeDesc->usrDataFormat = UCS2_16BIT;
 						break;
-			
+
 					default:
 						*pError = ERR_CHAR_SET;
 						return (FALSE);
 						break;
-				 }	
-				
+				 }
+
 				 if (grpId == GROUP1_WITH_MSG_CLASS)
-				 {		
+				 {
 					 /** Special case consideration Flash Messsage */
 					 if ((pPduDecodeDesc->dataCodeScheme & 0x03) == MSG_CLASS0)
 					 {
-						 pPduDecodeDesc->isFlashMsg = TRUE;	
+						 pPduDecodeDesc->isFlashMsg = TRUE;
 					 }
 				 }
 				 break;
-				
+
 			case GROUP2_WITH_MSG_CLASS:
 				/** Special case consideration Flash Messsage */
 				if ((pPduDecodeDesc->dataCodeScheme & 0x03) == MSG_CLASS0)
 				{
-					 pPduDecodeDesc->isFlashMsg = TRUE;	
+					 pPduDecodeDesc->isFlashMsg = TRUE;
 				}
 				switch ((pPduDecodeDesc->dataCodeScheme & 0x04) >> 2)
 				{
 					case GSM_7BIT:
 						pPduDecodeDesc->usrDataFormat = GSM_7BIT;
 						break;
-				
+
 					case ANSI_8BIT:
 						pPduDecodeDesc->usrDataFormat = ANSI_8BIT;
 						/** Special case consideration WAP_PUSH Messsage */
@@ -1202,29 +1202,29 @@ BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 							pPduDecodeDesc->isWapPushMsg = TRUE;
 						}
 						break;
-				 }	
+				 }
 				 break;
-			
+
 			default:
 				*pError = ERR_DATA_CODE_SCHEME;
 				return (FALSE);
 				break;
 		}
-			
+
 	 }
-	 
+
 	 /** Service Center Time Stamp */
 	 i_HexBuf2AsciiBuf(&hexBuf[idx], TIME_STAMP_LEN, pPduDecodeDesc->timeStamp);
 	 i_DecSemiOctet2Ascii(pPduDecodeDesc->timeStamp, pPduDecodeDesc->timeStamp); // Internal Swapping
 	 idx = idx + TIME_STAMP_LEN;
-		 
+
  	 if (pPduDecodeDesc->msgType == MSG_TYPE_SMS_STATUS_REPORT)
 	 {
 		 /** Discharge Time Stamp */
 		 i_HexBuf2AsciiBuf(&hexBuf[idx], TIME_STAMP_LEN, pPduDecodeDesc->dischrgTimeStamp);
 		 i_DecSemiOctet2Ascii(pPduDecodeDesc->dischrgTimeStamp, pPduDecodeDesc->dischrgTimeStamp); // Internal Swapping
 		 idx = idx + TIME_STAMP_LEN;
-			 
+
 		 /** Status of SMS */
 		 pPduDecodeDesc->smsSts = hexBuf[idx++];
 		 if (pPduDecodeDesc->smsSts == 0x00)
@@ -1233,36 +1233,36 @@ BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 		 }
 		 else
 		 {
-			pPduDecodeDesc->smsSts = MSG_DELIVERY_FAIL; 
+			pPduDecodeDesc->smsSts = MSG_DELIVERY_FAIL;
 		 }
 		 return (TRUE);
 	 }
-		 
+
 	 /* User Data Length */
 	 pPduDecodeDesc->usrDataLen = hexBuf[idx++];
 	 udl = pPduDecodeDesc->usrDataLen;
-	 
+
 	 /* User Data */
-	 
+
 	 /*****************************************************************************
 	 * Below section of code process user data header information
 	 *****************************************************************************/
-	 
+
 	 if (pPduDecodeDesc->isHeaderPrsnt) 		// Check whether Header Present
 	 {
 		 pPduDecodeDesc->udhLen = hexBuf[idx++];
-		 
+
 		 for (length = idx; length < (idx + pPduDecodeDesc->udhLen); length += idx)
 		 {
 				pPduDecodeDesc->udhInfoType = hexBuf[idx++];
 				pPduDecodeDesc->udhInfoLen = hexBuf[idx++];
-				
+
 				if (pPduDecodeDesc->udhInfoType == IE_CONCATENATED_MSG) // whether Concatenated Message
 				{
 					pPduDecodeDesc->isConcatenatedMsg = TRUE;
 					pPduDecodeDesc->concateMsgRefNo = hexBuf[idx++];
-					pPduDecodeDesc->concateTotalParts = hexBuf[idx++];	 
-					pPduDecodeDesc->concateCurntPart = hexBuf[idx++];	 
+					pPduDecodeDesc->concateTotalParts = hexBuf[idx++];
+					pPduDecodeDesc->concateCurntPart = hexBuf[idx++];
 				}
 				else if (pPduDecodeDesc->udhInfoType == IE_PORT_ADDR_8BIT) // Port Address 8bit
 				{
@@ -1274,7 +1274,7 @@ BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 					pPduDecodeDesc->srcPortAddr = hexBuf[idx++];
 					pPduDecodeDesc->srcPortAddr = pPduDecodeDesc->srcPortAddr << 8;
 					pPduDecodeDesc->srcPortAddr |= hexBuf[idx++];
-					
+
 					pPduDecodeDesc->destPortAddr = hexBuf[idx++];
 					pPduDecodeDesc->destPortAddr = pPduDecodeDesc->destPortAddr << 8;
 					pPduDecodeDesc->destPortAddr |= hexBuf[idx++];
@@ -1284,21 +1284,21 @@ BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 					idx = idx + pPduDecodeDesc->udhInfoLen;
 				}
 		 }
-			
+
 		 if (pPduDecodeDesc->usrDataFormat == GSM_7BIT)
 		 {
 			UINT8 fillBitsNum = 0;
 			UINT8 udhSeptet = 0;
-		
+
 			/* Derive number of octet to be filled */
 			fillBitsNum = ((1 + pPduDecodeDesc->udhLen) * 8) % 7;
 			fillBitsNum = 7 - fillBitsNum;
-		
+
 			udhSeptet = (((1 + pPduDecodeDesc->udhLen) * 8) + fillBitsNum) / 7;
 			udl -= udhSeptet;
 		 }
 	 }
-	 
+
 	 /* Extract user data */
 	 if (pPduDecodeDesc->usrDataFormat == GSM_7BIT)
 	 {
@@ -1313,12 +1313,12 @@ BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError)
 		pPduDecodeDesc->usrDataLen = GsmStrToUtf8Str(pPduDecodeDesc->usrData, asciiLen, pPduDecodeDesc->usrData);
 	 }
 	 else 	// for 8/16bit data
-	 {	
+	 {
 	 	 memcpy(pPduDecodeDesc->usrData, &hexBuf[idx], pPduDecodeDesc->usrDataLen);
 		 pPduDecodeDesc->usrData[pPduDecodeDesc->usrDataLen] = '\0';
 	 }
-	 
-	 return (TRUE);		 		 
+
+	 return (TRUE);
 }
 
 //***********************************************************************************************
@@ -1339,7 +1339,7 @@ BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStr
 	 UINT8 fillBits = 0;
 	 UINT16 gsmLen = 0;
 	 UINT8 hexBuf[SMS_PDU_MAX_LEN + 1];
-	
+
 	 if (pPduEncodeDesc->smscAddrLen != 0)  // Check whether Service Centre Present
 	 {
 		/* Service center Number Length */
@@ -1349,7 +1349,7 @@ BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStr
 		}
 		pPduEncodeDesc->smscAddrLen = 1 + (pPduEncodeDesc->smscAddrLen / 2);  // Adding length of Type of Addr
 		hexBuf[idx++] = pPduEncodeDesc->smscAddrLen;
-		
+
 		/* Service Center Type of Address (Eg: 91 , 81) */
 		if (pPduEncodeDesc->smscTypeOfAddr == NUM_TYPE_INTERNATIONAL)
 		{
@@ -1358,12 +1358,12 @@ BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStr
 		else if (pPduEncodeDesc->smscTypeOfAddr == NUM_TYPE_NATIONAL)
 		{
 			hexBuf[idx++] = 0xA1;
-		}	
+		}
 		else // Unknown
 		{
 			hexBuf[idx++] = 0x81;
 		}
-		
+
 		/* Service Center Number */
 		i_Ascii2DecSemiOctet(pPduEncodeDesc->smscAddr, pPduEncodeDesc->smscAddr); // Internal Swapping
 		addrLen = i_AsciiBuf2HexBuf(pPduEncodeDesc->smscAddr, &hexBuf[idx]);
@@ -1373,11 +1373,11 @@ BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStr
 	 {
 		hexBuf[idx++] = 0x00; // SMSC stored on phone is used
 	 }
-	 
+
 	 /* First Octet of SMS_SUBMIT PDU */
 	 pPduEncodeDesc->firstOct |= MSG_TYPE_SMS_SUBMIT;
 	 pPduEncodeDesc->firstOct |= pPduEncodeDesc->vldtPrdFrmt;
-	 
+
 	 if (pPduEncodeDesc->isConcatenatedMsg)
 	 {
 		pPduEncodeDesc->firstOct |= USER_DATA_HEADER_INDICATION;	// Indicate that UDH is present
@@ -1386,7 +1386,7 @@ BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStr
 		{
 			/* Indicate that delivery report is require */
 			if(pPduEncodeDesc->isDeliveryReq)
-			{	
+			{
 				pPduEncodeDesc->firstOct |= STATUS_REPORT_INDICATOR;
 			}
 		}
@@ -1395,19 +1395,19 @@ BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStr
 	 else
 	 {
 		 if(pPduEncodeDesc->isDeliveryReq)
-		 {	
+		 {
 			 pPduEncodeDesc->firstOct |= STATUS_REPORT_INDICATOR;	// Indicate that delivery report is require
 		 }
 	 }
-	
+
 	 hexBuf[idx++] = pPduEncodeDesc->firstOct;
-	
+
 	 /* Allow Mobile to set Message Reference No. */
-	 hexBuf[idx++] = MSG_REF_NO_DEFAULT; 
-	 
+	 hexBuf[idx++] = MSG_REF_NO_DEFAULT;
+
 	 /* Phone Number Length */
 	 hexBuf[idx++] = pPduEncodeDesc->phoneAddrLen;
-		 
+
 	 /* Phone Number Type of Address (Eg: 91 , 81) */
 	 if (pPduEncodeDesc->phoneTypeOfAddr == NUM_TYPE_INTERNATIONAL)
 	 {
@@ -1416,23 +1416,23 @@ BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStr
 	 else if (pPduEncodeDesc->phoneTypeOfAddr == NUM_TYPE_NATIONAL)
 	 {
 		hexBuf[idx++] = 0xA1;
-	 }	
+	 }
 	 else
 	 {
 		hexBuf[idx++] = 0x81;
 	 }
-	 
+
 	 /* Phone Number (Source Address) */
 	 i_Ascii2DecSemiOctet(pPduEncodeDesc->phoneAddr, pPduEncodeDesc->phoneAddr); // Internal Swapping
 	 addrLen = i_AsciiBuf2HexBuf(pPduEncodeDesc->phoneAddr, &hexBuf[idx]);
 	 idx = idx + addrLen;
-	 
+
 	 /* Protocol Identifier */
 	 hexBuf[idx++] = 0x00;
-			 
+
 	 /* Data Coding Scheme */
 	 pPduEncodeDesc->dataCodeScheme |= (pPduEncodeDesc->usrDataFormat << 2); // Character Set
-	 	
+
 	 /* Special case considerations WAP-PUSH & Flash Messsage */
 	 if (pPduEncodeDesc->isFlashMsg)
 	 {
@@ -1442,35 +1442,35 @@ BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStr
 	 {
 		pPduEncodeDesc->dataCodeScheme = 0xF5;
 	 }
-		
+
 	 hexBuf[idx++] = pPduEncodeDesc->dataCodeScheme;
-	 
+
 	 switch (pPduEncodeDesc->vldtPrdFrmt)
 	 {
 		 case VLDTY_PERIOD_DEFAULT: //Validity Period not preset
 			  break;
-			
+
 		 case VLDTY_PERIOD_RELATIVE: // One octet
 			  hexBuf[idx++] = pPduEncodeDesc->vldtPrd;
 			  break;
-			
+
 		 default:
 			  /* Reserved */
 			  break;
 	 }
-	
+
 	 /* User Data Length */
 	 pPduEncodeDesc->usrDataLen = strlen(pPduEncodeDesc->usrData); // for 8/16bit data
 
 	 /* User Data */
-	
+
 	 /* Check whether length is sufficient */
 	 if (pPduEncodeDesc->usrDataFormat == GSM_7BIT)
 	 {
-			gsmLen = strlen(pPduEncodeDesc->usrData);	// for GSM_7bit data		
+			gsmLen = strlen(pPduEncodeDesc->usrData);	// for GSM_7bit data
 			tidx = idx;
 			hexBuf[idx++] = gsmLen;		// TP-UDL
-			
+
 			if (gsmLen > SMS_GSM7BIT_MAX_LEN)
 			{
 					gsmLen = TRUNCATED_GSM_DATA_LEN;
@@ -1479,40 +1479,40 @@ BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStr
 	 else // for 8bit & 16bit Data
 	 {
 			hexBuf[idx++] = pPduEncodeDesc->usrDataLen;		// TP-UDL
-			
+
 			if (pPduEncodeDesc->usrDataLen > SMS_PDU_USER_DATA_MAX_LEN)
 			{
 					pPduEncodeDesc->usrDataLen = TRUNCATED_PDU_DATA_LEN;
-			}		
+			}
 	 }
-	
+
 	 /*****************************************************************************
 	 * Below section of code process user data header information
 	 *****************************************************************************/
-	 
+
 	 if (pPduEncodeDesc->isConcatenatedMsg) // Check for Concatenated Message
 	 {
 		 if (pPduEncodeDesc->usrDataFormat == GSM_7BIT)
-		 {	
+		 {
 			UINT8 fillBitsNum = 0;
 			UINT8 udhSeptet = 0;
-		
+
 			/* Derive number of octet to be filled */
 			fillBitsNum = ((1 + UDH_CONCATENATED_MSG_LEN) * 8) % 7;
 			fillBitsNum = 7 - fillBitsNum;
-			
+
 			/* Derive User Data Length in septets */
 			udhSeptet = (((1 + UDH_CONCATENATED_MSG_LEN) * 8) + fillBitsNum) / 7;
 			hexBuf[tidx] = gsmLen + udhSeptet; // Updating TP-UDL
-			tidx = idx; 					  
-			
+			tidx = idx;
+
 			hexBuf[idx++] = UDH_CONCATENATED_MSG_LEN;
 			hexBuf[idx++] = IE_CONCATENATED_MSG;
 			hexBuf[idx++] = IE_CONCATENATED_MSG_LEN;
 			hexBuf[idx++] = pPduEncodeDesc->concateMsgRefNo;
-			hexBuf[idx++] = pPduEncodeDesc->concateTotalParts; 
+			hexBuf[idx++] = pPduEncodeDesc->concateTotalParts;
 			hexBuf[idx++] = pPduEncodeDesc->concateCurntPart;
-			
+
 			/* Copy 7bit text to buffer */
 			Utf8StrToGsmStr(pPduEncodeDesc->usrData, gsmLen, pPduEncodeDesc->usrData, &gsmLen);
 			tidx = tidx + udhSeptet;  // for septet boundary of user data header
@@ -1524,19 +1524,19 @@ BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStr
 			hexBuf[idx++] = IE_CONCATENATED_MSG;
 			hexBuf[idx++] = IE_CONCATENATED_MSG_LEN;
 			hexBuf[idx++] = pPduEncodeDesc->concateMsgRefNo;
-			hexBuf[idx++] = pPduEncodeDesc->concateTotalParts; 
+			hexBuf[idx++] = pPduEncodeDesc->concateTotalParts;
 			hexBuf[idx++] = pPduEncodeDesc->concateCurntPart;
-			
+
 			/* Copy 8/16bit text to buffer */
 			memcpy(&hexBuf[idx], pPduEncodeDesc->usrData, pPduEncodeDesc->usrDataLen);
 			hexBuf[pPduEncodeDesc->usrDataLen] = '\0';
 		}
-		
-	 }	
+
+	 }
 	 else
 	 {
 		 if (pPduEncodeDesc->usrDataFormat == GSM_7BIT)
-		 {		
+		 {
 			 /* Copy 7bit text to buffer */
 			 Utf8StrToGsmStr(pPduEncodeDesc->usrData, gsmLen, pPduEncodeDesc->usrData, &gsmLen);
 			 i_Text2Pdu(pPduEncodeDesc->usrData, gsmLen, &hexBuf[idx]);
@@ -1548,12 +1548,12 @@ BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStr
 			 hexBuf[pPduEncodeDesc->usrDataLen] = '\0';
 		 }
 	 }
-		
+
 	/* Deriving length & String to be sent in AT command */
 	gsmPduStrLen = idx;
 	memcpy(pGsmPduStr, hexBuf, gsmPduStrLen);
-	
+
 	return (TRUE);
 
-			 		 
+
 }

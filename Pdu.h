@@ -1,4 +1,4 @@
-
+#pragma once
 
 //###########################################################################
 // @INCLUDE
@@ -43,7 +43,7 @@ enum
 };
 
 /* Message Type indication */
-enum	
+enum
 {
 	MSG_TYPE_SMS_DELIVER = 0x00,
 	MSG_TYPE_SMS_SUBMIT = 0x01,
@@ -92,6 +92,23 @@ enum
 //###########################################################################
 // @DATATYPE
 //###########################################################################
+
+typedef struct
+{
+	UINT8 day;
+	UINT8 month;
+	UINT8 year;
+
+} DATE_DESC;
+
+typedef struct
+{
+	UINT8 hour;
+	UINT8 minute;
+	UINT8 second;
+
+} TIME_DESC;
+
 /* PDU Decode Descriptor */
 typedef struct
 {
@@ -99,32 +116,32 @@ typedef struct
 	UINT8 smscNpi;							/* Numbering Plan Indicactor */
 	UINT8 smscTypeOfAddr;					/* Type of Address of Service Center Number */
 	char smscAddr[ADDR_OCTET_MAX_LEN + 1];	/* Service Center Number */
-	UINT8 firstOct;							/* First octet of PDU SMS */							
+	UINT8 firstOct;							/* First octet of PDU SMS */
 	BOOL isHeaderPrsnt;						/* User data header indicator */
 	UINT8 msgRefNo;							/* Message Reference Number */
-	
+
 	UINT8 phoneAddrLen;						/* Lenght of Phone Number */
-					
+
 	UINT8 phoneTypeOfAddr;					/* Type of Address of Phone Number */
-	
+
 	char phoneAddr[ADDR_OCTET_MAX_LEN + 1];	/* Phone Number */
-	
+
 	UINT8 protocolId;						/* Protocol Identifier */
 	UINT8 dataCodeScheme; 					/* Data Coding scheme */
-	UINT8 msgType;						    /* Message Type */ 
+	UINT8 msgType;						    /* Message Type */
 	BOOL isWapPushMsg;						/* WAP-PUSH SMS */
 	BOOL isFlashMsg;						/* FLASH SMS */
 	BOOL isStsReportReq;					/* Staus Report Flag */
 	BOOL isMsgWait;							/* Message Waiting */
-	
+
 	UINT8 usrDataFormat;					/* User Data Coding Format */
-	
+
 	char timeStamp[TIME_STAMP_OCTET_MAX_LEN + 1];		 /* Service Center Time Stamp */
 	char dischrgTimeStamp[TIME_STAMP_OCTET_MAX_LEN + 1]; /* Discharge Time Stamp */
-	
+
 	UINT8 vldtPrd;							 /* Validity Period */
 	UINT8 vldtPrdFrmt;						 /* Validity Period Format */
-	
+
 	UINT8 usrDataLen;							    				/* User Data Length */
 	UINT8 usrData[SMS_GSM7BIT_MAX_LEN * UTF8_CHAR_LEN + 1];   		/* User Data for GSM_7bit, ANSI_8bit & UCS2_16bit*/
 	UINT8 udhLen;									/* User Data Header Length */
@@ -140,24 +157,8 @@ typedef struct
 	BOOL isDeliveryReq;
 	DATE_DESC date;
 	TIME_DESC time;
-	
+
 } PDU_DESC;
-
-typedef struct
-{
-	UINT8 day;
-	UINT8 month;
-	UINT8 year;	
-	
-} DATE_DESC;
-
-typedef struct
-{
-	UINT8 hour;
-	UINT8 minute;
-	UINT8 second;	
-	
-} TIME_DESC;
 
 //###########################################################################
 // @PROTOTYPE
@@ -165,5 +166,4 @@ typedef struct
 BOOL DecodePduData(char *pGsmPduStr, PDU_DESC *pPduDecodeDesc, UINT8 *pError);
 BOOL EncodePduData(PDU_DESC *pPduEncodeDesc, UINT8 *pGsmPduStr, UINT16 gsmPduStrLen);
 
-#endif	// PDU_H
 
